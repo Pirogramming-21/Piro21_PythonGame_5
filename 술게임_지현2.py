@@ -103,31 +103,55 @@ def play_game(game, players, selector):
 
 def play_369(players):
     current_number = 1
+    
+    def timer_expired():
+        nonlocal timer_expired_flag
+        timer_expired_flag = True
+
+    def get_correct_answer(number):
+        if number in [33, 66, 99]:
+            return '짝짝'
+        elif '3' in str(number) or '6' in str(number) or '9' in str(number):
+            return '짝'
+        else:
+            return str(number)
+
     while True:
         for player in players:
+            print(f"\n{player[0]}의 차례입니다. (현재 숫자: {current_number})")
+            
+            timer_expired_flag = False
+            timer = threading.Timer(5.0, timer_expired)
+            timer.start()
+
+            correct_answer = get_correct_answer(current_number)
+
             if player[0] == players[0][0]:  # 사용자 차례
-                user_input = input(f"{current_number}에 해당하는 값을 입력하세요 (숫자 또는 '짝'): ")
-                if '3' in str(current_number) or '6' in str(current_number) or '9' in str(current_number):
-                    if user_input != '짝':
-                        print("틀렸습니다! '짝'을 입력해야 합니다.")
-                        return player
-                elif user_input != str(current_number):
-                    print(f"틀렸습니다! {current_number}를 입력해야 합니다.")
-                    return player
-            else:  # 참여자 차례
-                if '3' in str(current_number) or '6' in str(current_number) or '9' in str(current_number):
-                    if random.random() < 0.5:  # 50% 확률로 실수
-                        print(f"{player[0]}가 실수했습니다!")
-                        return player
-                    else:
-                        print(f"{player[0]}: 짝")
-                else:
-                    print(f"{player[0]}: {current_number}")
+                user_input = input(f"{current_number}에 해당하는 값을 입력하세요 (숫자, '짝' 또는 '짝짝') (제한 시간 5초): ")
+            else:  # AI 플레이어 차례
+                time.sleep(random.uniform(1, 3))  # AI가 생각하는 시간
+                if random.random() < 0.7:  # 70% 확률로 정답
+                    user_input = correct_answer
+                else:  # 30% 확률로 오답
+                    wrong_answers = ['짝', '짝짝', str(current_number)]
+                    wrong_answers.remove(correct_answer)
+                    user_input = random.choice(wrong_answers)
+                print(f"{player[0]}의 선택: {user_input}")
+
+            timer.cancel()
+
+            if timer_expired_flag:
+                print("시간 초과!")
+                return player
+
+            if user_input != correct_answer:
+                print(f"틀렸습니다! 정답은 '{correct_answer}'입니다.")
+                return player
             
             current_number += 1
             if current_number > 50:  # 게임 종료 조건
                 return random.choice(players)
-
+            
 def play_subway_game(players):
     subway_lines = {
         '1호선': ['인천', '동인천', '도원', '제물포', '도화', '주안', '간석', '동암', '백운', '부평', '부개', '송내', '중동', '부천', '소사', '역곡', '온수', '오류동', '개봉', '구일', '구로', '신도림', '영등포', '신길', '대방', '노량진', '용산', '남영', '서울역', 
