@@ -122,7 +122,7 @@ def play_game(game, players, selector):
         loser = play_mando_game(players)
 
     print(f"\n{game} 이 끝났습니다!")
-    print(f"🚨 패자: {loser[0]}")
+    print(f"\n🚨 패자: {loser[0]}")
     return loser
 
 ##-게임 1. 369 ---------------------------------------------------------------------
@@ -456,7 +456,7 @@ def play_mando_game(players):
                     except ValueError:
                         print("유효한 만두 입력만 가능합니다 ('만두 만두', '만두', 'X'). 다시 입력해주세요.")
         
-        print("\n참가자들이 만두 값을 선택합니다.")
+        print("\n~~~~참가자들이 만두 값을 선택합니다.~~~~\n")
         for player in players:
             if player[0] != user_name:  # AI 플레이어가 만두 값을 선택합니다.
                 mando_value = random.choice([0, 5, 10])
