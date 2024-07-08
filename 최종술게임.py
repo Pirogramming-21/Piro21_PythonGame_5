@@ -117,7 +117,7 @@ def play_game(game, players, selector):
     elif game == "공공칠빵 게임":
         loser = play_007_game(players)
     elif game == "더게임오브데쓰":
-        loser = theGameofDeath(players)
+        loser = theGameofDeath(players,selector)
     elif game == "만두게임":
         loser = play_mando_game(players)
 
@@ -358,28 +358,14 @@ def play_007_game(players):
 
 ##-게임 4. 더 게임 오브 데스 ---------------------------------------------------------------------
 
-
-def theGameofDeath(players):
+def theGameofDeath(players, selector):
     if not (2 <= len(players) <= 4):
         print("플레이어 수는 최소 2명에서 최대 4명이어야 합니다.")
         return random.choice(players)
-
-    # 각 플레이어가 지목할 사람 설정 (자신을 제외한 다른 플레이어)
-    target_list = []
-    for player in players:
-        valid_targets = [p for p in players if p != player]
-        target = random.choice(valid_targets)
-        target_list.append(target)
-
-    print("\n각 플레이어가 지목할 사람 설정 완료:")
-    for idx, target in enumerate(target_list):
-        print(f"{players[idx][0]} -> {target[0]}")
-
     # 시작할 플레이어 선정
-    current_player = random.choice(players)
+    current_player = selector
     print(f"\n{current_player[0]}님이 시작합니다.")
-
-    # 라운드 진행
+    #죽음의 숫자 선택
     if current_player == players[0]:  # 사용자가 시작자일 경우
         death_number = int(input(f"{current_player[0]}의 차례입니다. 죽음의 번호를 입력하세요 (2-10): "))
         while death_number < 2 or death_number > 10:
@@ -389,20 +375,42 @@ def theGameofDeath(players):
         print(f"{current_player[0]}의 차례입니다. 죽음의 번호는 {death_number}입니다.")
 
     print(f"\n죽음의 숫자는 {death_number}입니다.\n")
+    # 각 플레이어가 지목할 사람 설정 (자신을 제외한 다른 플레이어)
+    target_list = []
+    for player in players:
+        if player == players[0]:  # 사용자가 지목할 사람을 입력하는 경우
+            while True:
+                target_name = input(f"{player[0]}님, 지목할 사람의 이름을 입력하세요 (자신은 지목할 수 없습니다): ")
+                if target_name in [p[0] for p in players if p != player]:
+                    target = next(p for p in players if p[0] == target_name)
+                    break
+                else:
+                    print("잘못된 입력입니다. 플레이어 목록에서 선택하세요.")
+        else:  # AI 플레이어가 지목할 사람을 무작위로 선택하는 경우
+            valid_targets = [p for p in players if p != player]
+            target = random.choice(valid_targets)
+        target_list.append(target)
 
+    print("\n각 플레이어가 지목할 사람 설정 완료:")
+    for idx, target in enumerate(target_list):
+        print(f"{players[idx][0]} -> {target[0]}")
+
+    # 라운드 진행
     count = 1
     current_index = players.index(current_player)
-    print(f"카운트 시작: {current_player[0]}")
+    print(f"카운트 시작: ")
 
     while count <= death_number:
         next_player = target_list[current_index]
         print(f"카운트 {count}: {players[current_index][0]} -> {next_player[0]}")
+        time.sleep(0.5)
         current_index = players.index(next_player)
         count += 1
 
     eliminated_player = players[current_index]
     print(f"\nPlayer {eliminated_player[0]} is eliminated.")
     return eliminated_player
+
 
 
 ##-게임 5. 만두 게임 -----------------------------------------------
