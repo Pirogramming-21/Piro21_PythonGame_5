@@ -109,11 +109,11 @@ def select_first_player(players):
     return random.choice(players)
 
 def play_game(game, players, selector):
-    print(f"\n{game} 게임을 시작합니다!\n")
+    print(f"\n{game} 을 시작합니다!\n")
     if game == "369게임":
         loser = play_369(players)
     elif game == "지하철 게임":
-        loser = play_subway_game(players)
+        loser = play_subway_game(players, selector)
     elif game == "공공칠빵 게임":
         loser = play_007_game(players)
     elif game == "더게임오브데쓰":
@@ -121,7 +121,7 @@ def play_game(game, players, selector):
     elif game == "만두게임":
         loser = play_mando_game(players)
 
-    print(f"\n{game} 게임이 끝났습니다!")
+    print(f"\n{game} 이 끝났습니다!")
     print(f"🚨 패자: {loser[0]}")
     return loser
 
@@ -180,7 +180,7 @@ def play_369(players):
             
 ##-게임 2. 지하철 게임 ---------------------------------------------------------------------
           
-def play_subway_game(players):
+def play_subway_game(players, selector):
     subway_lines = {
         '1호선': ['인천', '동인천', '도원', '제물포', '도화', '주안', '간석', '동암', '백운', '부평', '부개', '송내', '중동', '부천', '소사', '역곡', '온수', '오류동', '개봉', '구일', '구로', '신도림', '영등포', '신길', '대방', '노량진', '용산', '남영', '서울역', 
                 '시청', '종각', '종로3가', '종로5가', '동대문', '동묘앞', '신설동', '제기동', '청량리', '회기', '외대앞', '신이문', '석계', '광운대', '월계', '녹천', '창동', '방학', '도봉', '도봉산', '망월사', '회룡', '의정부', '가능', '녹양', '양주', 
@@ -207,14 +207,28 @@ def play_subway_game(players):
 
     all_stations = set(station for line in subway_lines.values() for station in line)
 
-    print("지하철 게임을 시작합니다!")
+    # 호선 선택
+    if selector[0] == players[0][0]:  # 사용자인 경우
+        print("선택 가능한 호선:")
+        for i, line in enumerate(subway_lines.keys(), 1):
+            print(f"{i}. {line}")
+        while True:
+            try:
+                line_choice = int(input("호선 번호를 선택하세요: "))
+                if 1 <= line_choice <= len(subway_lines):
+                    current_line = list(subway_lines.keys())[line_choice - 1]
+                    break
+                else:
+                    print("올바른 호선 번호를 선택해주세요.")
+            except ValueError:
+                print("숫자를 입력해주세요.")
+    else:  # AI 플레이어인 경우
+        current_line = random.choice(list(subway_lines.keys()))
     
-    # 발회자(첫 번째 플레이어)가 노선 선택
-    current_line = random.choice(list(subway_lines.keys()))
-    print(f"{players[0][0]}님이 {current_line}을 선택했습니다.")
+    print(f"{selector[0]}님이 {current_line}을 선택했습니다.")
 
     used_stations = set()
-    current_player_index = 0
+    current_player_index = players.index(selector)
     direction = 1  # 1: 정방향, -1: 역방향
 
     def timer_expired():
@@ -241,8 +255,6 @@ def play_subway_game(players):
                     wrong_lines = [line for line in subway_lines.keys() if line != current_line]
                     wrong_line = random.choice(wrong_lines)
                     station = random.choice(subway_lines[wrong_line])
-                else:  # non_existent
-                    station = "존재하지 않는 역"
             else:
                 station = random.choice([s for s in subway_lines[current_line] if s not in used_stations])
             print(f"{current_player[0]}의 선택: {station}")
