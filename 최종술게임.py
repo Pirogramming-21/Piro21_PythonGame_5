@@ -342,7 +342,7 @@ def play_007_game(players):
                     return next_player
             else:
                 time.sleep(random.uniform(0.5, 2.5))  # AI 반응 시간
-                if random.random() < 0.3 or timer_expired_flag:  # 30% 확률로 AI가 실수 또는 시간 초과
+                if random.random() < 0.5 or timer_expired_flag:  # 30% 확률로 AI가 실수 또는 시간 초과
                     timer.cancel()
                     print(f"{left_player[0]} 또는 {right_player[0]}가 제 시간에 반응하지 못했습니다!")
                     return random.choice([left_player, right_player])
